@@ -13,9 +13,10 @@ import (
 type Tag string
 
 const (
-	QueryTag  Tag = "query"
-	PathTag   Tag = "path"
-	HeaderTag Tag = "header"
+	QueryTag   Tag = "query"
+	PathTag    Tag = "path"
+	HeaderTag  Tag = "header"
+	DefaultTag Tag = "default"
 )
 
 func bindInput(ctx *gofr.Context, ip reflect.Value) error {
@@ -37,6 +38,11 @@ func bindInput(ctx *gofr.Context, ip reflect.Value) error {
 	}
 
 	err = bindHeaders(ctx, ip)
+	if err != nil {
+		return err
+	}
+
+	err = setDefaults(ip)
 	if err != nil {
 		return err
 	}

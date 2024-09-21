@@ -36,14 +36,14 @@ package main
 type PostUserRequest struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
-	Age   int    `json:"age"`
+	Age   int    `json:"age" default:"21"`
 }
 
 type GetUserRequest struct {
 	ID    int    `path:"id"`
 	Name  string `query:"name"`
 	Email string `query:"email"`
-	Age   int    `query:"age"`
+	Age   int    `query:"age" default:"21"`
 }
 
 type DeleteUserRequest struct {

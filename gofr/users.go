@@ -12,7 +12,7 @@ type UserID struct {
 type PostUserRequest struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
-	Age   int    `json:"age"`
+	Age   int    `json:"age" default:"21"`
 }
 
 func postUser(ctx *gofr.Context, user *PostUserRequest) (*User, error) {
@@ -28,20 +28,15 @@ type GetUserRequest struct {
 	UserID
 	Name  string `query:"name"`
 	Email string `query:"email"`
-	Age   int    `query:"age"`
+	Age   int    `query:"age" default:"21"`
 }
 
 func getUser(ctx *gofr.Context, req *GetUserRequest) (*User, error) {
 	name := "user name"
 	email := "user@email.com"
-	age := 21
 
 	if req.Name != "" {
 		name = req.Name
-	}
-
-	if req.Age != 0 {
-		age = req.Age
 	}
 
 	if req.Email != "" {
@@ -52,7 +47,7 @@ func getUser(ctx *gofr.Context, req *GetUserRequest) (*User, error) {
 		ID:    req.ID,
 		Name:  name,
 		Email: email,
-		Age:   age,
+		Age:   req.Age,
 	}, nil
 }
 

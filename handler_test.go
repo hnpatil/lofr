@@ -229,3 +229,78 @@ type basicRequest struct {
 func basicHandler(ctx *gofr.Context, req *basicRequest) (*basicRequest, error) {
 	return req, nil
 }
+
+func Test_QueryParamsWithDefaultValues(t *testing.T) {
+	tests := []struct {
+		desc    string
+		queries map[string]interface{}
+		res     *queryWithDefaults
+		err     error
+	}{
+		{
+			desc:    "case: no queries passed",
+			queries: map[string]interface{}{},
+			res: &queryWithDefaults{
+				Name:    "person",
+				Age:     21,
+				Score:   8.5,
+				Balance: 100,
+			},
+		},
+		{
+			desc: "case: some queries passed",
+			queries: map[string]interface{}{
+				"name": "User Name",
+				"age":  25,
+			},
+			res: &queryWithDefaults{
+				Name:    "User Name",
+				Age:     25,
+				Score:   8.5,
+				Balance: 100,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			queryParams := url.Values{}
+
+			for k, v := range test.queries {
+				queryParams.Add(k, fmt.Sprintf("%v", v))
+			}
+
+			u := &url.URL{
+				Path: "/basic",
+			}
+
+			u.RawQuery = queryParams.Encode()
+
+			req := httptest.NewRequest("GET", u.String(), nil)
+
+			ctx := &gofr.Context{
+				Context: context.TODO(),
+				Request: http.NewRequest(req),
+			}
+
+			res, err := Handler(defaultQueriesHandler)(ctx)
+			assert.Equal(t, test.err, err)
+			if err != nil {
+				assert.Nil(t, test.res)
+			} else {
+				assert.Equal(t, test.res, res)
+			}
+		})
+	}
+}
+
+type queryWithDefaults struct {
+	Name    string  `query:"name" default:"person"`
+	Age     uint    `query:"age" default:"21"`
+	Score   float64 `query:"score" default:"8.5"`
+	Balance int     `query:"balance" default:"100"`
+}
+
+func defaultQueriesHandler(ctx *gofr.Context, req *queryWithDefaults) (*queryWithDefaults, error) {
+	return req, nil
+}
