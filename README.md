@@ -1,4 +1,6 @@
 # lofr
+[![Maintainability](https://api.codeclimate.com/v1/badges/4e76134aa21a7f79949e/maintainability)](https://codeclimate.com/github/hnpatil/lofr/maintainability)
+
 lofr lets you write simpler [gofr](https://gofr.dev/) handlers.
 
 **key features**
