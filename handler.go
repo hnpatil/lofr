@@ -123,13 +123,18 @@ func validateInput(hv reflect.Value) (reflect.Type, error) {
 		return nil, fmt.Errorf("handler %s does not accept *gofr.Context as first parameter, got %s", fName, ht.In(0).String())
 	}
 
+	var (
+		t   reflect.Type
+		err error
+	)
+
 	if n == 2 {
 		if ht.In(1).Kind() != reflect.Ptr || ht.In(1).Elem().Kind() != reflect.Struct {
-			return nil, fmt.Errorf("handler %s does not accept pointer to struct as second parameter, got %s", fName, ht.In(1).String())
+			err = fmt.Errorf("handler %s does not accept pointer to struct as second parameter, got %s", fName, ht.In(1).String())
 		} else {
-			return ht.In(1).Elem(), nil
+			t = ht.In(1).Elem()
 		}
 	}
 
-	return nil, nil
+	return t, err
 }

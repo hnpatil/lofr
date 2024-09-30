@@ -18,17 +18,7 @@ func setDefaults(v reflect.Value) error {
 		field := v.Field(i)
 
 		if fieldType.Anonymous {
-			if field.Kind() == reflect.Ptr {
-				if field.IsNil() {
-					field.Set(reflect.New(field.Type().Elem()))
-				}
-			} else {
-				if field.CanAddr() {
-					field = field.Addr()
-				}
-			}
-
-			err := setDefaults(field)
+			err := setAnonymousDefaults(field)
 			if err != nil {
 				return err
 			}
@@ -49,6 +39,25 @@ func setDefaults(v reflect.Value) error {
 		if err != nil {
 			return http.ErrorInvalidParam{Params: []string{tagValue}}
 		}
+	}
+
+	return nil
+}
+
+func setAnonymousDefaults(field reflect.Value) error {
+	if field.Kind() == reflect.Ptr {
+		if field.IsNil() {
+			field.Set(reflect.New(field.Type().Elem()))
+		}
+	} else {
+		if field.CanAddr() {
+			field = field.Addr()
+		}
+	}
+
+	err := setDefaults(field)
+	if err != nil {
+		return err
 	}
 
 	return nil

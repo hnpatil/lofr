@@ -97,17 +97,7 @@ func bind(v reflect.Value, tag Tag, extractor func(field string) (string, error)
 		field := v.Field(i)
 
 		if fieldType.Anonymous {
-			if field.Kind() == reflect.Ptr {
-				if field.IsNil() {
-					field.Set(reflect.New(field.Type().Elem()))
-				}
-			} else {
-				if field.CanAddr() {
-					field = field.Addr()
-				}
-			}
-
-			err := bind(field, tag, extractor)
+			err := bindAnonymous(field, tag, extractor)
 			if err != nil {
 				return err
 			}
@@ -138,36 +128,86 @@ func bind(v reflect.Value, tag Tag, extractor func(field string) (string, error)
 	return nil
 }
 
+func bindAnonymous(field reflect.Value, tag Tag, extractor func(field string) (string, error)) error {
+	if field.Kind() == reflect.Ptr {
+		if field.IsNil() {
+			field.Set(reflect.New(field.Type().Elem()))
+		}
+	} else {
+		if field.CanAddr() {
+			field = field.Addr()
+		}
+	}
+
+	err := bind(field, tag, extractor)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func bindValue(value string, field reflect.Value) error {
+	var err error
+
 	switch field.Kind() {
 	case reflect.String:
 		field.SetString(value)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		i, err := strconv.ParseInt(value, 10, field.Type().Bits())
-		if err != nil {
-			return err
-		}
-		field.SetInt(i)
+		err = bindInt(value, field)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		i, err := strconv.ParseUint(value, 10, field.Type().Bits())
-		if err != nil {
-			return err
-		}
-		field.SetUint(i)
+		err = bindUint(value, field)
 	case reflect.Bool:
-		b, err := strconv.ParseBool(value)
-		if err != nil {
-			return err
-		}
-		field.SetBool(b)
+		err = bindBool(value, field)
 	case reflect.Float32, reflect.Float64:
-		i, err := strconv.ParseFloat(value, field.Type().Bits())
-		if err != nil {
-			return err
-		}
-		field.SetFloat(i)
+		err = bindFloat(value, field)
 	default:
-		return fmt.Errorf("unsupported parameter type: %v", field.Kind())
+		err = fmt.Errorf("unsupported parameter type: %v", field.Kind())
 	}
+
+	return err
+}
+
+func bindInt(value string, field reflect.Value) error {
+	i, err := strconv.ParseInt(value, 10, field.Type().Bits())
+	if err != nil {
+		return err
+	}
+
+	field.SetInt(i)
+
+	return nil
+}
+
+func bindUint(value string, field reflect.Value) error {
+	i, err := strconv.ParseUint(value, 10, field.Type().Bits())
+	if err != nil {
+		return err
+	}
+
+	field.SetUint(i)
+
+	return nil
+}
+
+func bindBool(value string, field reflect.Value) error {
+	b, err := strconv.ParseBool(value)
+	if err != nil {
+		return err
+	}
+
+	field.SetBool(b)
+
+	return nil
+}
+
+func bindFloat(value string, field reflect.Value) error {
+	i, err := strconv.ParseFloat(value, field.Type().Bits())
+	if err != nil {
+		return err
+	}
+
+	field.SetFloat(i)
+
 	return nil
 }
