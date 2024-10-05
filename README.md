@@ -1,5 +1,6 @@
 # lofr
 [![Maintainability](https://api.codeclimate.com/v1/badges/4e76134aa21a7f79949e/maintainability)](https://codeclimate.com/github/hnpatil/lofr/maintainability)
+[![codecov](https://codecov.io/github/hnpatil/lofr/graph/badge.svg?token=LKGYQC9C97)](https://codecov.io/github/hnpatil/lofr)
 
 lofr lets you write simpler [gofr](https://gofr.dev/) handlers.
 
