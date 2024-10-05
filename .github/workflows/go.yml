@@ -11,20 +11,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-  steps:
-  - name: Checkout code
-    uses: actions/checkout@v3
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-  - name: Set up Go
-    uses: actions/setup-go@v4
-    with:
-      go-version: '1.23.0'
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23.0'
 
-  - name: Install dependencies
-    run: go mod tidy
+    - name: Install dependencies
+      run: go mod tidy
 
-  - name: Run tests
-    run: go test ./...
+    - name: Run tests
+      run: go test ./...
 
-  - name: Build project
-    run: go build -v ./...
+    - name: Build project
+      run: go build -v ./...
