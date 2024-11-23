@@ -304,3 +304,56 @@ type queryWithDefaults struct {
 func defaultQueriesHandler(ctx *gofr.Context, req *queryWithDefaults) (*queryWithDefaults, error) {
 	return req, nil
 }
+
+func Test_PostWithValidation(t *testing.T) {
+	tests := []struct {
+		desc string
+		body []byte
+		err  error
+	}{
+		{
+			desc: "case: missing email",
+			body: []byte(`{"name":"First Name","age":21}`),
+			err:  http.ErrorMissingParam{Params: []string{"Email"}},
+		},
+		{
+			desc: "case: invalid email",
+			body: []byte(`{"name":"First Name","age":21, "email": "1234567890"}`),
+			err:  http.ErrorInvalidParam{Params: []string{"Email"}},
+		},
+		{
+			desc: "case: invalid request",
+			body: []byte(`{"name":"First Name","age":21, "email": "lite@gofr.com"}`),
+		},
+		{
+			desc: "case: invalid age",
+			body: []byte(`{"name":"First Name","age":18, "email": "lite@gofr.com"}`),
+			err:  http.ErrorInvalidParam{Params: []string{"Age"}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			req := httptest.NewRequest("POST", "/basic", bytes.NewBuffer(test.body))
+			req.Header.Set("Content-Type", "application/json")
+
+			ctx := &gofr.Context{
+				Context: context.TODO(),
+				Request: http.NewRequest(req),
+			}
+
+			_, err := Handler(defaultPostHandler)(ctx)
+			assert.Equal(t, test.err, err)
+		})
+	}
+}
+
+type postRequest struct {
+	Name  string `json:"name"`
+	Age   uint   `json:"age" validate:"gte=21"`
+	Email string `json:"email" validate:"required,email"`
+}
+
+func defaultPostHandler(ctx *gofr.Context, req *postRequest) error {
+	return nil
+}

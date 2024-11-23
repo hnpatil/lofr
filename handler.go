@@ -42,6 +42,10 @@ func Handler(handler interface{}) gofr.Handler {
 				return nil, err
 			}
 
+			if err = validateRequest(input); err != nil {
+				return nil, err
+			}
+
 			args = append(args, input)
 		}
 
