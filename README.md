@@ -38,7 +38,7 @@ package main
 
 type PostUserRequest struct {
 	Name  string `json:"name"`
-	Email string `json:"email"`
+	Email string `json:"email" validate:"required,email"`
 	Age   int    `json:"age" default:"21"`
 }
 
