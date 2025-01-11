@@ -80,7 +80,8 @@ func bindQueryParams(ctx *gofr.Context, ip reflect.Value) error {
 // bindHeaders won't work at the moment since gofr does not make headers accessible
 func bindHeaders(ctx *gofr.Context, ip reflect.Value) error {
 	return bind(ip, HeaderTag, func(field string) (string, error) {
-		return "", nil
+		val, _ := ctx.Value(field).(string)
+		return val, nil
 	})
 }
 
