@@ -338,7 +338,7 @@ func Test_PostWithValidation(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 
 			ctx := &gofr.Context{
-				Context: context.TODO(),
+				Context: context.WithValue(context.TODO(), "X-User-Id", "101"),
 				Request: http.NewRequest(req),
 			}
 
@@ -349,9 +349,10 @@ func Test_PostWithValidation(t *testing.T) {
 }
 
 type postRequest struct {
-	Name  string `json:"name"`
-	Age   uint   `json:"age" validate:"gte=21"`
-	Email string `json:"email" validate:"required,email"`
+	UserID string `header:"X-User-Id" validate:"required"`
+	Name   string `json:"name"`
+	Age    uint   `json:"age" validate:"gte=21"`
+	Email  string `json:"email" validate:"required,email"`
 }
 
 func defaultPostHandler(ctx *gofr.Context, req *postRequest) error {
