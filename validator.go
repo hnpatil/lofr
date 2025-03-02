@@ -7,7 +7,18 @@ import (
 	"reflect"
 )
 
+var skipValidation bool
+
+// SkipValidation sets skipValidation. When set as true, request validation is skipped.
+func SkipValidation(value bool) {
+	skipValidation = value
+}
+
 func validateRequest(request reflect.Value) error {
+	if skipValidation {
+		return nil
+	}
+
 	err := validator.New().Struct(request.Interface())
 	if err != nil {
 		var vErr validator.ValidationErrors
