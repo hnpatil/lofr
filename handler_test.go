@@ -186,7 +186,7 @@ func Test_RequestBody(t *testing.T) {
 		{
 			desc: "case: invalid filed type in body",
 			body: []byte(`{"id":"First Name","lastName":"Last Name"}`),
-			err:  http.ErrorInvalidParam{Params: []string{"id"}},
+			err:  http.ErrorInvalidParam{Params: []string{"Person.id"}},
 		},
 	}
 
@@ -336,9 +336,10 @@ func Test_PostWithValidation(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			req := httptest.NewRequest("POST", "/basic", bytes.NewBuffer(test.body))
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("X-User-Id", "101")
 
 			ctx := &gofr.Context{
-				Context: context.WithValue(context.TODO(), "X-User-Id", "101"),
+				Context: context.WithValue(context.TODO(), Headers, req.Header),
 				Request: http.NewRequest(req),
 			}
 
